@@ -1,16 +1,16 @@
 {
-  "name": "wp",
-  "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
+  "name": "@everlastlucas/imgviewer",
+  "version": "0.0.1",
+  "description": "A tiny image preview component by Vue.js2.x",
+  "main": "./dist/imgViewer.js",
   "scripts": {
     "build": "webpack --config webpack.prod.js",
     "dev": "webpack-dev-server --inline --progress --config webpack.dev.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
+  "keywords": ["vue","previewer","vue-plugin"],
+  "author": "Lucas",
+  "license": "MIT",
   "devDependencies": {
     "autoprefixer": "^9.4.7",
     "babel-core": "^6.26.3",
