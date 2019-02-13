@@ -71,13 +71,14 @@ export default {
         imgEl.style.width = `${newWidth}px`;
         imgEl.style.height = `${newHeight}px`;
         console.log(newHeight, newWidth);
-        container.scrollLeft = 100;
-        /*
-            this.$nextTick(() => {
-              console.log("scrollLeft:", scrollLeft);
-              container.scrollLeft = scrollLeft; // !不生效？
-            });
-            */
+        this.$nextTick(() => {
+          console.log('scrollChange');
+          console.log(container);
+          console.log(container.scrollLeft);
+          console.log(container.scrollWidth);
+          console.log(container.scrollHeight);
+          container.scrollLeft = container.scrollWidth;
+        });
       } else {
         this.pinchResize = false;
         imgEl.className = "default-view";
@@ -133,17 +134,19 @@ export default {
       };
       img.src = src;
       //this.bindGesture();
-    }
+    },
   },
   mounted() {
     this.imgEl = this.$refs.img;
     this.container = this.$refs.container;
+    console.log('hot mr');
   }
 };
 </script>
 
 <style lang="scss" scoped>
 .image-item {
+  display: block;
   height: 100%;
   width: 100%;
   overflow: auto;

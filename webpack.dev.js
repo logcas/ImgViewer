@@ -6,10 +6,13 @@ const HtmlWebpackPlugin = require('html-webpack-plugin');
 
 module.exports = merge(config, {
   mode: 'development',
-  entry: path.resolve(__dirname, 'src', 'index.js'),
+  entry: {
+    bundle: path.resolve(__dirname, 'src', 'index.js'),
+    imgViewer: path.resolve(__dirname, 'src', 'imgViewer.js'),
+  },
   output: {
     path: path.resolve(__dirname, 'dist'),
-    filename: 'bundle.js',
+    filename: '[name].js',
   },
   devServer: {
     contentBase: path.join(__dirname, 'dist'),

@@ -1,5 +1,5 @@
 <template>
-  <div class="img-viewer" v-show="isDisplay">
+  <div class="img-viewer" v-show="isDisplay" @scroll="handleScroll">
     <transition name="fade">
       <div class="view-mask" v-show="isDisplay">
         <img-item ref="img" @hide-viewer="handleHide"></img-item>
@@ -33,7 +33,10 @@ export default {
     showViewer(src) {
       this.$children[0].showViewer(src);
       this.isDisplay = true;
-    }
+    },
+    handleScroll() {
+      console.log('scroll');
+    },
   },
   mounted() {}
 };
