@@ -16,6 +16,11 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+html, body {
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+}
 $cc: red;
 h1 {
   color: $cc;

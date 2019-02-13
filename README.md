@@ -12,7 +12,7 @@ This project is buiding in progress and it couldn't be used in production enviro
 
 ## Install
 ```
-npm install @everlastlucas/img-viewer
+npm install @everlastlucas/imgviewer
 ```
 
 ## How to use

@@ -1,9 +1,15 @@
 <template>
   <div class="image-item" @click="handleClick" ref="container">
-    <img class="default-view" 
-         :src="imgSrc" 
-         v-finger:double-tap="bindDoubleTap"
-         ref="img">
+    <img
+      :class="{'on-control': isTouchMoving}"
+      :src="imgSrc"
+      :style="translateStyle"
+      v-finger:double-tap="bindDoubleTap"
+      v-finger:touch-start="bindTouchStart"
+      v-finger:touch-move="bindTouchMove"
+      v-finger:touch-end="bindTouchEnd"
+      ref="img"
+    >
   </div>
 </template>
 
@@ -16,8 +22,39 @@ export default {
       originAttrs: {},
       pinchResize: false,
       imgEl: null,
-      container: null
+      container: null,
+      isTouchMoving: false, // 监视touchmove
+      touchPosition: { x: 0, y: 0 },
+
+      // image config
+      currentWidth: 0,
+      currentHeight: 0,
+      deltaX: 0,
+      deltaY: 0
     };
+  },
+  computed: {
+    // X轴位移
+    translateX() {
+      return this.currentWidth === 0
+        ? "-50%"
+        : -1 * (this.currentWidth / 2 + this.deltaX) + "px";
+    },
+    // Y轴位移
+    translateY() {
+      return this.currentHeight === 0
+        ? "-50%"
+        : -1 * (this.currentHeight / 2 + this.deltaY) + "px";
+    },
+    // 位置、大小样式
+    translateStyle() {
+      return {
+        transform: `translate(${this.translateX},${this.translateY})`,
+        width: this.currentWidth + "px",
+        height: this.currentHeight + "px",
+        "max-width": this.currentWidth + "px"
+      };
+    }
   },
   methods: {
     // 计算初始状态下图片的展示宽高
@@ -42,14 +79,66 @@ export default {
         ratio
       };
     },
+    bindSwipe(e) {
+      console.log("swipe", e);
+    },
+    bindTouchStart(e) {
+      console.log("touchStart", e);
+      if (this.isTouchMoving || e.changedTouches[0].target !== this.imgEl)
+        return;
+      this.isTouchMoving = true;
+    },
+    bindTouchMove(e) {
+      if (!this.isTouchMoving) return;
+      const {
+        width,
+        height,
+        left,
+        top,
+        bottom,
+        right
+      } = this.imgEl.getBoundingClientRect();
+      const { deltaX, deltaY } = e;
+      (this.deltaX = -deltaX + this.deltaX),
+        (this.deltaY = -deltaY + this.deltaY);
+      console.log(this.deltaX, this.deltaY);
+    },
+    bindTouchEnd(e) {
+      this.isTouchMoving = false;
+      // 计算回弹
+      const {
+        width,
+        height,
+        left,
+        top,
+        bottom,
+        right
+      } = this.imgEl.getBoundingClientRect();
+      let newDeltaX = this.deltaX,
+        newDeltaY = this.deltaY;
+      // 情况一 left > 0 并且 right > window.innerWidth 图片移动太靠右了
+      if (left > 0 && right > window.innerWidth) {
+        newDeltaX += Math.min(left, right - window.innerWidth);
+      }
+      // 情况二 left < 0 并且 right < window.innerWidth 图片移动太靠左了
+      if (left < 0 && right < window.innerWidth) {
+        newDeltaX += -Math.min(-left, window.innerWidth - right);
+      }
+      // 情况三 top > 0 并且 bottom > window.innerHeight 图片移动太靠下了
+      if (top > 0 && bottom > window.innerHeight) {
+        newDeltaY += Math.min(top, bottom - window.innerHeight);
+      }
+      // 情况四 top < 0 并且 bottom < window.innnerHeight 图片移动太靠上了
+      if (top < 0 && bottom < window.innerHeight) {
+        newDeltaY += -Math.min(-top, window.innerHeight - bottom);
+      }
+      this.deltaX = newDeltaX;
+      this.deltaY = newDeltaY;
+    },
     bindDoubleTap(e) {
-      //        console.log(e);
-      //        console.log(imgEl.getBoundingClientRect());
       let imgEl = this.imgEl,
-          container = this.container;
+        container = this.container;
       if (e.target !== imgEl) return;
-      console.log("-----------------------");
-      console.log("dbtap");
       const { width, height, left } = imgEl.getBoundingClientRect();
       let touches = e.changedTouches[0],
         touchX = touches.clientX - left,
@@ -63,25 +152,10 @@ export default {
           width,
           height
         );
-
-        let touchRatio = touchX / width; // 点击坐标所在位置与整个对象的比值
-        let scrollLeft = (newWidth - width) * touchRatio;
-        imgEl.className = "";
-        imgEl.style.maxWidth = `${newWidth}px`;
-        imgEl.style.width = `${newWidth}px`;
-        imgEl.style.height = `${newHeight}px`;
-        console.log(newHeight, newWidth);
-        this.$nextTick(() => {
-          console.log('scrollChange');
-          console.log(container);
-          console.log(container.scrollLeft);
-          console.log(container.scrollWidth);
-          console.log(container.scrollHeight);
-          container.scrollLeft = container.scrollWidth;
-        });
+        this.currentWidth = newWidth;
+        this.currentHeight = newHeight;
       } else {
         this.pinchResize = false;
-        imgEl.className = "default-view";
         let {
           width: defaultWidth,
           height: defaultHeight
@@ -89,14 +163,10 @@ export default {
           this.originAttrs.width,
           this.originAttrs.height
         );
-        imgEl.style.maxWidth = `${defaultWidth}px`;
-        imgEl.style.width = `${defaultWidth}px`;
-        imgEl.style.height = `${defaultHeight}px`;
-        /*
-            this.$nextTick(() => {
-              container.scrollLeft = 0;
-            });
-            */
+        this.currentWidth = defaultWidth;
+        this.currentHeight = defaultHeight;
+        this.deltaX = 0;
+        this.deltaY = 0;
       }
     },
     handleClick(e) {
@@ -104,24 +174,11 @@ export default {
         this.$emit("hide-viewer");
       }
     },
-    bindGesture() {
-      let imgEl = this.$refs.img;
-      let container = this.$refs.container;
-      let that = this;
-      imgEl.$af = new AlloyFinger(imgEl, {
-        doubleTap(e) {}
-      });
-    },
     showViewer(src) {
       this.pinchResize = false;
       const img = new Image();
       let that = this;
       let imgEl = this.imgEl;
-      /*
-      if (imgEl.$af) {
-        imgEl.$af = imgEl.$af.destroy();
-      }
-      */
       imgEl.style.maxWidth = "100%";
       img.onload = function() {
         const { width, height } = that.getFitInitSize(img.width, img.height);
@@ -133,13 +190,11 @@ export default {
         console.log("loaded:", width, height);
       };
       img.src = src;
-      //this.bindGesture();
-    },
+    }
   },
   mounted() {
     this.imgEl = this.$refs.img;
     this.container = this.$refs.container;
-    console.log('hot mr');
   }
 };
 </script>
@@ -149,18 +204,17 @@ export default {
   display: block;
   height: 100%;
   width: 100%;
-  overflow: auto;
+  overflow: hidden;
 
   img {
     position: relative;
-    transition: all 0.2s ease-in-out;
-    top: 0;
-    left: 0;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    transition: all 0.2s ease-in;
 
-    &.default-view {
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
+    &.on-control {
+      transition: none;
     }
   }
 }

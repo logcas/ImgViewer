@@ -45,15 +45,13 @@ export default {
 <style lang="scss" scoped>
 .fade-enter-active,
 .fade-leave-active {
-  transition: all 0.2s ease-in-out;
+  transition: all 0.6s cubic-bezier(0.35,0.75,0.48,0.99);
 }
 .fade-enter, .fade-leave-to /* .fade-leave-active below version 2.1.8 */ {
-  opacity: 0;
   transform: translateY(100%);
 }
 .fade-enter-to,
 .fade-leave {
-  opacity: 1;
   transform: translateY(0);
 }
 
