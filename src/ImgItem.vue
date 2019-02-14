@@ -1,5 +1,5 @@
 <template>
-  <div class="image-item" @click="handleClick">
+  <div class="image-item" @click="handleClick" ref="container">
     <ul
       class="image-list"
       v-finger:touch-start="bindTouchStart"
@@ -194,7 +194,7 @@ export default {
       }
     },
     handleClick(e) {
-      if (e.target !== this.$refs.img) {
+      if (e.target !== this.currentImageEl) {
         this.$emit("hide-viewer");
       }
     },
