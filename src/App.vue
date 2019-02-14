@@ -1,6 +1,7 @@
 <template>
   <div>
-    <img src="http://img.lxzmww.xyz/cnode/qrcode.jpg" v-viewer>
+    <img src="http://img.lxzmww.xyz/cnode/qrcode.jpg" v-viewer:1>
+    <img src="http://img.lxzmww.xyz/ph2.jpg" v-viewer:1>
   </div>
 </template>
 
