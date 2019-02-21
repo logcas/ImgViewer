@@ -11,7 +11,7 @@ This project is buiding in progress and it couldn't be used in production enviro
 🎹 Based on directive
 
 ## Screenshot
-![viewer](http://img.lxzmww.xyz/imgviewerImgViewer.gif)
+![viewer](http://img.lxzmww.xyz/ImgViewer.gif)
 
 
 ## Install
@@ -45,6 +45,7 @@ Then, you can swipe to swich a image.
 ## Development Progress
 - [x] DoubleTap to zoom.
 - [x] Group images supports, slide to switch image.
+- [x] Lazy load.
 - [ ] Pinch to resize.
 - [ ] Rotate by gesture.
 
